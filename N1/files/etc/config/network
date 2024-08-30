@@ -16,6 +16,13 @@ config interface 'lan'
 	option ipaddr '192.168.3.2'
 	option gateway '192.168.3.1'
 	option delegate '0'
+	option broadcast '192.168.0.255'
+	list dns '192.168.3.1'
+
+config device
+	option name 'br-lan'
+	option type 'bridge'
+	list ports 'eth0'
 
 config device
 	option type 'bridge'
@@ -24,7 +31,7 @@ config device
 config globals 'globals'
 	option packet_steering '1'
 
-config interface 'utun'
+config interface 'tun'
 	option proto 'none'
 	option ifname 'utun'
 	option device 'utun'
