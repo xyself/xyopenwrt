@@ -1,12 +1,15 @@
-name: my N1
+name: Build ImmortalWrt for N1
 
 on:
   workflow_dispatch:
-   inputs:
+    inputs:
       ssh:
         description: 'SSH connection to Actions'
         required: false
         default: 'false'
+      password:
+        description: 'Enter the password to proceed'
+        required: true
   schedule:
     - cron: "0 0 * * 1"
 
@@ -25,10 +28,24 @@ jobs:
     runs-on: ubuntu-20.04
 
     steps:
+    - name: Validate Password
+      id: validate_password
+      if: ${{ github.event_name == 'workflow_dispatch' }}
+      run: |
+        EXPECTED_PASSWORD="${{ secrets.XYpassword }}"
+        PROVIDED_PASSWORD="${{ github.event.inputs.password }}"
+        if [ "$PROVIDED_PASSWORD" != "$EXPECTED_PASSWORD" ]; then
+          echo "Invalid password"
+          exit 1
+        fi
+        echo "Password validated successfully"
+
     - name: Checkout
+      if: ${{ steps.validate_password.outcome == 'success' || github.event_name != 'workflow_dispatch' }}
       uses: actions/checkout@main
 
     - name: Free up space
+      if: ${{ steps.validate_password.outcome == 'success' || github.event_name != 'workflow_dispatch' }}
       uses: jlumbroso/free-disk-space@main
       with:
         tool-cache: false
@@ -38,6 +55,7 @@ jobs:
         large-packages: true
         docker-images: true
         swap-storage: true
+
 
     - name: Initialize environment
       env:
