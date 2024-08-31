@@ -12,6 +12,12 @@ CONFIG_PACKAGE_luci-app-mosdns=y
 CONFIG_PACKAGE_luci-app-mihomo=y
 CONFIG_PACKAGE_luci-app-tailscale=y
 CONFIG_PACKAGE_luci-luci-app-amlogic=y
+CONFIG_PACKAGE_luci-app-autoreboot=y
+CONFIG_PACKAGE_luci-app-ddns=y
+CONFIG_PACKAGE_luci-app-filebrowser=y
+CONFIG_PACKAGE_luci-app-homeproxy=y
+CONFIG_PACKAGE_luci-app-upnp=y
+CONFIG_PACKAGE_luci-app-wechatpush=y
 " >> .config
 # Default IP
 sed -i 's/192.168.1.1/192.168.3.2/g' package/base-files/files/bin/config_generate
