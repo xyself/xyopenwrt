@@ -1,5 +1,4 @@
 name: my Immortal N1
-
 on:
   workflow_dispatch:
     inputs:
@@ -36,11 +35,6 @@ jobs:
         PROVIDED_PASSWORD="${{ github.event.inputs.password }}"
         if [ "$PROVIDED_PASSWORD" != "$EXPECTED_PASSWORD" ]; then
           echo "Invalid password"
-          echo "::error::Invalid password"
-          echo "Deleting workflow run..."
-          curl -X DELETE \
-            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-            "https://api.github.com/repos/${{ github.repository }}/actions/runs/${{ github.run_id }}"
           exit 1
         fi
         echo "Password validated successfully"
@@ -60,6 +54,7 @@ jobs:
         large-packages: true
         docker-images: true
         swap-storage: true
+
 
     - name: Initialize environment
       env:
