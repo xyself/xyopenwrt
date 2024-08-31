@@ -1,4 +1,4 @@
-name: my ImmortalWrt N1
+name: my Immortal N1
 
 on:
   workflow_dispatch:
@@ -56,6 +56,12 @@ jobs:
         docker-images: true
         swap-storage: true
 
+    - name: Delete Workflow Runs on Failure
+      if: ${{ steps.validate_password.outcome == 'failure' }}
+      uses: mattraks/delete-workflow-runs@v2
+      with:
+        retain_days: 0
+        keep_minimum_runs: 0
 
     - name: Initialize environment
       env:
