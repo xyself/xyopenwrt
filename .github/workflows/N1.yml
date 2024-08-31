@@ -16,6 +16,8 @@ env:
   CONFIG_FILE: N1/.config
   DIY_SH: N1/diy.sh
   FILES: N1/files
+  TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+  TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
   TZ: Asia/Shanghai
 
 jobs:
@@ -59,6 +61,10 @@ jobs:
       working-directory: ./openwrt
       run: |
         ./scripts/feeds update -a
+        echo >> feeds.conf.default
+        echo 'src-git istore https://github.com/linkease/istore;main' >> feeds.conf.default
+        ./scripts/feeds update istore
+        ./scripts/feeds install -d y -p istore luci-app-store
         ./scripts/feeds install -a
 
     - name: Load custom config
@@ -117,6 +123,13 @@ jobs:
           IP: 192.168.3.2
           账户: root
           密码: password
+    - name: Telegram notification
+      if: env.TELEGRAM_TOKEN && ! contains(github.event.action, 'notg')
+      continue-on-error: true
+      run: |
+          curl -k --data chat_id="${{ env.TELEGRAM_CHAT_ID }}" --data "text=🎉 OpenWrt ${{ env.VERSION }} ${{matrix.target}} 编译成功 😋  ${{ env.COWURL }}   ${{ env.WETRANS }} 🚀" "https://api.telegram.org/bot${{ env.TELEGRAM_TOKEN }}/sendMessage"
+
+
 
     - name: Delete old releases
       uses: dev-drprasad/delete-older-releases@master
