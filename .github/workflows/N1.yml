@@ -36,6 +36,11 @@ jobs:
         PROVIDED_PASSWORD="${{ github.event.inputs.password }}"
         if [ "$PROVIDED_PASSWORD" != "$EXPECTED_PASSWORD" ]; then
           echo "Invalid password"
+          echo "::error::Invalid password"
+          echo "Deleting workflow run..."
+          curl -X DELETE \
+            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            "https://api.github.com/repos/${{ github.repository }}/actions/runs/${{ github.run_id }}"
           exit 1
         fi
         echo "Password validated successfully"
@@ -55,13 +60,6 @@ jobs:
         large-packages: true
         docker-images: true
         swap-storage: true
-
-    - name: Delete Workflow Runs on Failure
-      if: ${{ steps.validate_password.outcome == 'failure' }}
-      uses: mattraks/delete-workflow-runs@v2
-      with:
-        retain_days: 0
-        keep_minimum_runs: 0
 
     - name: Initialize environment
       env:
@@ -147,13 +145,12 @@ jobs:
           IP: 192.168.3.2
           账户: root
           密码: password
+
     - name: Telegram notification
       if: env.TELEGRAM_TOKEN && ! contains(github.event.action, 'notg')
       continue-on-error: true
       run: |
           curl -k --data chat_id="${{ env.TELEGRAM_CHAT_ID }}" --data "text=🎉 OpenWrt ${{ env.VERSION }} ${{matrix.target}} 编译成功 😋  ${{ env.COWURL }}   ${{ env.WETRANS }} 🚀" "https://api.telegram.org/bot${{ env.TELEGRAM_TOKEN }}/sendMessage"
-
-
 
     - name: Delete old releases
       uses: dev-drprasad/delete-older-releases@master
