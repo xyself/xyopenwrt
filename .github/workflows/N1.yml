@@ -94,7 +94,7 @@ jobs:
       uses: unifreq/openwrt_packit@master
       env:
         OPENWRT_ARMVIRT: openwrt/bin/targets/*/*/*.tar.gz
-        KERNEL_VERSION_NAME: 6.6.47
+        KERNEL_VERSION_NAME: 6.6.48
         PACKAGE_SOC: diy
         GZIP_IMGS: .xz
         SCRIPT_DIY_PATH: N1/mk_s905d_n1.sh
@@ -123,5 +123,5 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        keep_latest: 8
+        keep_latest: 4
         delete_tags : true
