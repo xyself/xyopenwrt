@@ -1,4 +1,8 @@
 #!/bin/bash
+# Remove packages
+rm -rf feeds/luci/applications/luci-app-passwall
+# Default IP
+sed -i 's/192.168.1.1/192.168.3.2/g' package/base-files/files/bin/config_generate
 
 rm -rf feeds/packages/net/v2ray-geodata
 git clone https://github.com/sbwml/luci-app-mosdns -b v5 package/mosdns
@@ -19,11 +23,6 @@ CONFIG_PACKAGE_luci-app-homeproxy=y
 CONFIG_PACKAGE_luci-app-upnp=y
 CONFIG_PACKAGE_luci-app-wechatpush=y
 " >> .config
-# Default IP
-sed -i 's/192.168.1.1/192.168.3.2/g' package/base-files/files/bin/config_generate
-
-# Remove packages
-rm -rf feeds/luci/applications/luci-app-passwall
 
 # Add packages
 git clone https://github.com/nantayo/My-Pkg package/my-pkg
