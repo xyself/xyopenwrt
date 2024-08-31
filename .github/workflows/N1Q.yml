@@ -1,4 +1,4 @@
-name: QBuild ImmortalWrt for N1
+name: my Q N1
 
 on:
   workflow_dispatch:
