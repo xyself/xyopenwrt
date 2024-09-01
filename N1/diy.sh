@@ -7,7 +7,7 @@ git clone https://github.com/sbwml/v2ray-geodata package/v2ray-geodata
 git clone --depth=1 https://github.com/ophub/luci-app-amlogic package/amlogic
 git clone https://github.com/morytyann/OpenWrt-mihomo package/luci-app-mihomo
 git clone https://github.com/asvow/luci-app-tailscale package/luci-app-tailscale
-git clone https://github.com/destan19/OpenAppFilter package/OpenAppFilter
+#git clone https://github.com/destan19/OpenAppFilter package/OpenAppFilter
 #定时限速
 git clone https://github.com/sirpdboy/luci-app-eqosplus package/luci-app-eqosplus
 git clone https://github.com/zzsj0928/luci-app-pushbot package/luci-app-pushbot
@@ -15,7 +15,7 @@ git clone https://github.com/zzsj0928/luci-app-pushbot package/luci-app-pushbot
 luci-app-banip
 # 插件
 echo "
-CONFIG_PACKAGE_luci-app-oaf=y
+#CONFIG_PACKAGE_luci-app-oaf=y
 CONFIG_PACKAGE_luci-app-mosdns=y
 CONFIG_PACKAGE_luci-app-mihomo=y
 CONFIG_PACKAGE_luci-app-tailscale=y
