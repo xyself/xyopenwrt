@@ -13,7 +13,7 @@ git clone https://github.com/linkease/istore package/istore/luci-app-store
 git clone https://github.com/sirpdboy/luci-app-eqosplus package/luci-app-eqosplus
 git clone https://github.com/zzsj0928/luci-app-pushbot package/luci-app-pushbot
 #git clone https://github.com/lucikap/luci-app-nettask package/luci-app-nettask
-luci-app-banip
+#luci-app-banip
 # 插件
 echo "
 CONFIG_PACKAGE_luci-app-store=y
