@@ -18,7 +18,6 @@ git clone https://github.com/zzsj0928/luci-app-pushbot package/luci-app-pushbot
 echo "
 #CONFIG_PACKAGE_luci-app-oaf=y
 #CONFIG_PACKAGE_luci-app-store=y
-#CONFIG_PACKAGE_luci-app-oaf=y
 CONFIG_PACKAGE_luci-app-mosdns=y
 CONFIG_PACKAGE_luci-app-mihomo=y
 CONFIG_PACKAGE_luci-app-tailscale=y
