@@ -3,7 +3,7 @@ sed -i '/\/etc\/init\.d\/tailscale/d;/\/etc\/config\/tailscale/d;' feeds/package
 # rm -rf feeds/luci/applications/luci-app-passwall
 rm -rf feeds/packages/net/v2ray-geodata
 git clone https://github.com/sbwml/luci-app-mosdns -b v5 package/mosdns
-#git clone https://github.com/sbwml/v2ray-geodata package/v2ray-geodata
+git clone https://github.com/sbwml/v2ray-geodata package/v2ray-geodata
 git clone --depth=1 https://github.com/ophub/luci-app-amlogic package/amlogic
 git clone https://github.com/morytyann/OpenWrt-mihomo package/luci-app-mihomo
 git clone https://github.com/asvow/luci-app-tailscale package/luci-app-tailscale
