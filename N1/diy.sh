@@ -16,7 +16,7 @@ git clone https://github.com/zzsj0928/luci-app-pushbot package/luci-app-pushbot
 #luci-app-banip
 # 插件
 echo "
-CONFIG_PACKAGE_luci-app-oaf=y
+#CONFIG_PACKAGE_luci-app-oaf=y
 CONFIG_PACKAGE_luci-app-store=y
 #CONFIG_PACKAGE_luci-app-oaf=y
 CONFIG_PACKAGE_luci-app-mosdns=y
