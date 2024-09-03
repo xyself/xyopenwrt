@@ -13,7 +13,7 @@ git clone https://github.com/sirpdboy/luci-app-eqosplus package/luci-app-eqosplu
 git clone https://github.com/sirpdboy/luci-app-lucky package/lucky
 git clone -b js https://github.com/sirpdboy/luci-theme-kucat package/luci-theme-kucat
 git clone https://github.com/sirpdboy/luci-app-advancedplus package/luci-app-advancedplus
-git clone https://github.com/destan19/OpenAppFilter package/OpenAppFilter
+#git clone https://github.com/destan19/OpenAppFilter package/OpenAppFilter
 #git clone https://github.com/zzsj0928/luci-app-pushbot package/luci-app-pushbot
 #git clone https://github.com/lucikap/luci-app-nettask package/luci-app-nettask
 # 插件
@@ -27,8 +27,8 @@ CONFIG_PACKAGE_luci-app-mihomo=y
 CONFIG_PACKAGE_luci-app-tailscale=y
 CONFIG_PACKAGE_luci-app-amlogic=y
 CONFIG_PACKAGE_luci-app-eqosplus=y
-CONFIG_PACKAGE_luci-app-oaf=y
 " >> .config
+#CONFIG_PACKAGE_luci-app-oaf=y
 #CONFIG_PACKAGE_luci-app-pushbot=y
 #CONFIG_PACKAGE_luci-app-nettask=y
 # Default IP
