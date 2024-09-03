@@ -115,13 +115,14 @@ jobs:
         SW_FLOWOFFLOAD: 0
         SFE_FLOW: 0
         ENABLE_WIFI_K510: 0
+
     - name: Upload firmware to Telegram
-       if: ${{ env.PACKAGED_STATUS == 'success' }} && !cancelled() && env.TELEGRAM_TOKEN
+      if: ${{ env.PACKAGED_STATUS == 'success' }} && !cancelled() && env.TELEGRAM_TOKEN
   continue-on-error: true
       run: |
-      for file in ${{ env.PACKAGED_OUTPUTPATH }}/*.img.xz; do
-        curl -F document=@"$file" -F chat_id="${{ env.TELEGRAM_CHAT_ID }}" -F caption="🚀 固件编译完成: $(basename $file)" "https://api.telegram.org/bot${{ env.TELEGRAM_TOKEN }}/sendDocument"
-      done
+    for file in ${{ env.PACKAGED_OUTPUTPATH }}/*.img.xz; do
+      curl -F document=@"$file" -F chat_id="${{ env.TELEGRAM_CHAT_ID }}" -F caption="🚀 固件编译完成: $(basename $file)" "https://api.telegram.org/bot${{ env.TELEGRAM_TOKEN }}/sendDocument"
+    done
 
     - name: Upload firmware to release
       uses: softprops/action-gh-release@master
