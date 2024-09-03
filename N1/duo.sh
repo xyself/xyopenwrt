@@ -13,7 +13,7 @@ git clone https://github.com/linkease/istore package/istore/luci-app-store
 git clone https://github.com/sirpdboy/luci-app-eqosplus package/luci-app-eqosplus
 #git clone https://github.com/zzsj0928/luci-app-pushbot package/luci-app-pushbot
 #git clone https://github.com/lucikap/luci-app-nettask package/luci-app-nettask
-git clone https://github.com/sirpdboy/luci-app-lucky.git package/lucky
+git clone https://github.com/sirpdboy/luci-app-lucky package/lucky
 git clone -b js https://github.com/sirpdboy/luci-theme-kucat package/luci-theme-kucat
 git clone https://github.com/sirpdboy/luci-app-advancedplus package/luci-app-advancedplus
 
