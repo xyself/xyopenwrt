@@ -1,4 +1,4 @@
-name: N1duo
+name: duo Build N1
 
 on:
   workflow_dispatch:
@@ -13,8 +13,8 @@ on:
 env:
   REPO_URL: https://github.com/immortalwrt/immortalwrt
   REPO_BRANCH: openwrt-23.05
-  CONFIG_FILE: N1/duo.config
-  DIY_SH: N1/duo.sh
+  CONFIG_FILE: N1/.config
+  DIY_SH: N1/diy.sh
   TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
   TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
   FILES: N1/files
