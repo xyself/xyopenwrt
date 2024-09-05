@@ -1,4 +1,4 @@
-name: zq N1
+name: zq copy N1
 
 on:
   workflow_dispatch:
@@ -8,8 +8,7 @@ on:
         required: false
         default: 'false'
   schedule:
-    - cron: "0 0 1,16 * *"
-
+    - cron: "0 0 */3 * *"
 env:
   REPO_URL: https://github.com/immortalwrt/immortalwrt
   REPO_BRANCH: openwrt-23.05
