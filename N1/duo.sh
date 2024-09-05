@@ -12,14 +12,13 @@ git clone https://github.com/asvow/luci-app-tailscale package/luci-app-tailscale
 git clone https://github.com/sirpdboy/luci-app-eqosplus package/luci-app-eqosplus
 git clone https://github.com/sirpdboy/luci-app-lucky package/lucky
 git clone -b js https://github.com/sirpdboy/luci-theme-kucat package/luci-theme-kucat
-git clone https://github.com/sirpdboy/luci-app-advancedplus package/luci-app-advancedplus
+#git clone https://github.com/sirpdboy/luci-app-advancedplus package/luci-app-advancedplus
 #git clone https://github.com/destan19/OpenAppFilter package/OpenAppFilter
 #git clone https://github.com/zzsj0928/luci-app-pushbot package/luci-app-pushbot
 #git clone https://github.com/lucikap/luci-app-nettask package/luci-app-nettask
 # 插件
 echo "
 CONFIG_PACKAGE_luci-theme-kucat=y
-CONFIG_PACKAGE_luci-app-advancedplus=y
 CONFIG_PACKAGE_luci-app-lucky=y
 CONFIG_PACKAGE_luci-app-mosdns=y
 CONFIG_PACKAGE_luci-app-mihomo=y
@@ -27,6 +26,7 @@ CONFIG_PACKAGE_luci-app-tailscale=y
 CONFIG_PACKAGE_luci-app-amlogic=y
 CONFIG_PACKAGE_luci-app-eqosplus=y
 " >> .config
+#CONFIG_PACKAGE_luci-app-advancedplus=y
 #CONFIG_PACKAGE_luci-app-store=y
 #CONFIG_PACKAGE_luci-app-oaf=y
 #CONFIG_PACKAGE_luci-app-pushbot=y
