@@ -16,6 +16,7 @@ git clone --depth=1 https://github.com/ophub/luci-app-amlogic package/amlogic
 git clone https://github.com/morytyann/OpenWrt-mihomo package/luci-app-mihomo
 git clone https://github.com/asvow/luci-app-tailscale package/luci-app-tailscale
 #git clone https://github.com/linkease/istore package/istore/luci-app-store
+#git_sparse_clone master https://github.com/linkease/istore luci/luci-app-store
 #定时限速
 git clone https://github.com/sirpdboy/luci-app-eqosplus package/luci-app-eqosplus
 git clone https://github.com/sirpdboy/luci-app-lucky package/lucky
