@@ -36,7 +36,12 @@ CONFIG_PACKAGE_luci-app-eqosplus=y
 sed -i 's/192.168.1.1/192.168.3.2/g' package/base-files/files/bin/config_generate
 
 # Remove packages
-
+uci set luci.main.lang='zh_cn'
+uci set luci.main.mediaurlbase='/luci-static/argon'
+uci add_list network.lan.dns='223.5.5.5'
+uci add_list network.lan.dns='223.6.6.6'
+uci set dhcp.cfg01411c.dns_redirect='1'
+uci commit
 
 # Add packages
 #git clone https://github.com/nantayo/My-Pkg package/my-pkg
