@@ -1,3 +1,4 @@
+
 config interface 'loopback'
 	option device 'lo'
 	option proto 'static'
@@ -16,6 +17,8 @@ config interface 'lan'
 	option ipaddr '192.168.3.2'
 	option gateway '192.168.3.1'
 	option delegate '0'
+	list dns '223.5.5.5'
+	list dns '223.6.6.6'
 
 config device
 	option name 'br-lan'
@@ -34,3 +37,4 @@ config interface 'tun'
 	option ifname 'tun'
 	option device 'tun'
 	option auto '0'
+
