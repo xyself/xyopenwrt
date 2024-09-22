@@ -102,6 +102,7 @@ jobs:
        sed -i 's|admin/services|admin/vpn|g' /usr/share/luci/menu.d/luci-app-homeproxy.json
        sed -i 's|admin/services|admin/nas|g' /usr/share/luci/menu.d/luci-app-frps.json
        sed -i 's|admin/services|admin|g' /usr/share/luci/menu.d/luci-app-mihomo.json
+       sed -i 's|"type": alias""|"type": "firstchild"|g' /usr/share/luci/menu.d/luci-app-mihomo.json
        sed -i 's|admin/services|admin|g' /usr/share/luci/menu.d/luci-app-mosdns.json
        sed -i 's|admin/services|admin/network|g' /usr/share/luci/menu.d/luci-app-wol.json
        sed -i 's|admin/services|admin/network|g' /usr/share/luci/menu.d/luci-app-upnp.json
