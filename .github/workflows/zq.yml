@@ -96,6 +96,17 @@ jobs:
         echo -e "$(nproc) thread compile"
         make -j$(nproc) || make -j1 || make -j1 V=s
         echo "compile_status=success" >> $GITHUB_ENV
+    - name: Modify luc
+      run: |
+       sed -i 's|admin/services|admin/vpn|g' /usr/share/luci/menu.d/luci-app-tailscale.json
+       sed -i 's|admin/services|admin/vpn|g' /usr/share/luci/menu.d/luci-app-homeproxy.json
+       sed -i 's|admin/services|admin/nas|g' /usr/share/luci/menu.d/luci-app-frps.json
+       sed -i 's|admin/services|admin|g' /usr/share/luci/menu.d/luci-app-mihomo.json
+       sed -i 's|admin/services|admin|g' /usr/share/luci/menu.d/luci-app-mosdns.json
+       sed -i 's|admin/services|admin/network|g' /usr/share/luci/menu.d/luci-app-wol.json
+       sed -i 's|admin/services|admin/network|g' /usr/share/luci/menu.d/luci-app-upnp.json
+       sed -i 's|admin/services|admin/network|g' /usr/share/luci/menu.d/luci-app-nlbwmon.json
+
     - name: Package armsr as openwrt
       if: ${{ env.compile_status }} == 'success' && !cancelled()
       uses: unifreq/openwrt_packit@master
@@ -128,7 +139,12 @@ jobs:
       if: env.TELEGRAM_TOKEN && ! contains(github.event.action, 'notg')
       continue-on-error: true
       run: |
-          curl -k --data chat_id="${{ env.TELEGRAM_CHAT_ID }}" --data "text=🎉 OpenWrt ${{ env.VERSION }} ${{matrix.target}} 编译成功 😋  ${{ env.COWURL }}   ${{ env.WETRANS }} 🚀" "https://api.telegram.org/bot${{ env.TELEGRAM_TOKEN }}/sendMessage"
+          if [[ "${{ job.status }}" == "success" ]]; then
+              message="🎉 OpenWrt ${{ env.VERSION }} ${{ matrix.target }} 编译成功 😋"
+          else
+              message="❌ OpenWrt ${{ env.VERSION }} ${{ matrix.target }} 编译失败，请检查日志！"
+          fi
+          curl -k --data chat_id="${{ env.TELEGRAM_CHAT_ID }}" --data "text=${message}" "https://api.telegram.org/bot${{ env.TELEGRAM_TOKEN }}/sendMessage"
     - name: Delete old releases
       uses: dev-drprasad/delete-older-releases@master
       env:
