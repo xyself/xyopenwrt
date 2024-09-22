@@ -107,7 +107,7 @@ jobs:
        sed -i 's|admin/services|admin/network|g' /usr/share/luci/menu.d/luci-app-upnp.json
        sed -i 's|admin/services|admin/network|g' /usr/share/luci/menu.d/luci-app-nlbwmon.json
        sed -i '/"title": "MihomoTProxy",/a\
-        "order": 1,' /usr/share/luci/menu.d/luci-app-mihomo.json
+               "order": 1,' /usr/share/luci/menu.d/luci-app-mihomo.json
     - name: Package armsr as openwrt
       if: ${{ env.compile_status }} == 'success' && !cancelled()
       uses: unifreq/openwrt_packit@master
