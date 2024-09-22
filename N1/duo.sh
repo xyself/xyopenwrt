@@ -10,7 +10,7 @@ git clone https://github.com/asvow/luci-app-tailscale package/luci-app-tailscale
 #git clone https://github.com/linkease/istore package/istore/luci-app-store
 #git_sparse_clone master https://github.com/linkease/istore luci/luci-app-store
 #定时限速
-git clone https://github.com/sirpdboy/luci-app-eqosplus package/luci-app-eqosplus
+#git clone https://github.com/sirpdboy/luci-app-eqosplus package/luci-app-eqosplus
 git clone https://github.com/sirpdboy/luci-app-lucky package/lucky
 #git clone -b js https://github.com/sirpdboy/luci-theme-kucat package/luci-theme-kucat
 #git clone https://github.com/sirpdboy/luci-app-advancedplus package/luci-app-advancedplus
@@ -24,8 +24,8 @@ CONFIG_PACKAGE_luci-app-mosdns=y
 CONFIG_PACKAGE_luci-app-mihomo=y
 CONFIG_PACKAGE_luci-app-tailscale=y
 CONFIG_PACKAGE_luci-app-amlogic=y
-CONFIG_PACKAGE_luci-app-eqosplus=y
 " >> .config
+#CONFIG_PACKAGE_luci-app-eqosplus=y
 #CONFIG_PACKAGE_luci-theme-kucat=y
 #CONFIG_PACKAGE_luci-app-advancedplus=y
 #CONFIG_PACKAGE_luci-app-store=y
