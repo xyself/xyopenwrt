@@ -91,7 +91,8 @@ jobs:
         find dl -size -1024c -exec rm -f {} \;
     - name: Compile the firmware
       run: |
-
+        chmod -R 755 openwrt
+        cd openwrt
         echo -e "$(nproc) thread compile"
         make -j$(nproc) || make -j1 || make -j1 V=s
         echo "compile_status=success" >> $GITHUB_ENV
