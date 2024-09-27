@@ -96,20 +96,6 @@ jobs:
         echo -e "$(nproc) thread compile"
         make -j$(nproc) || make -j1 || make -j1 V=s
         echo "compile_status=success" >> $GITHUB_ENV
-    - name: Modify luc
-      run: |
-        chmod -R 755 openwrt
-        cd openwrt
-        sed -i 's|admin/services|admin/vpn|g' ./usr/share/luci/menu.d/luci-app-tailscale.json
-        sed -i 's|admin/services|admin/vpn|g' ./usr/share/luci/menu.d/luci-app-homeproxy.json
-        sed -i 's|admin/services|admin/nas|g' ./usr/share/luci/menu.d/luci-app-frps.json
-        sed -i 's|admin/services|admin|g' ./usr/share/luci/menu.d/luci-app-mihomo.json
-        sed -i 's|type": "alias|type": "firstchild|g' ./usr/share/luci/menu.d/luci-app-mihomo.json
-        sed -i 's|admin/services|admin|g' ./usr/share/luci/menu.d/luci-app-mosdns.json
-        sed -i 's|admin/services|admin/network|g' ./usr/share/luci/menu.d/luci-app-wol.json
-        sed -i 's|admin/services|admin/network|g' ./usr/share/luci/menu.d/luci-app-upnp.json
-        sed -i 's|admin/services|admin/network|g' ./usr/share/luci/menu.d/luci-app-nlbwmon.json
-        echo "compile_status=success" >> $GITHUB_ENV
     - name: Package armsr as openwrt
       if: ${{ env.compile_status }} == 'success' && !cancelled()
       uses: unifreq/openwrt_packit@master
