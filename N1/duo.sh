@@ -11,7 +11,7 @@ function git_sparse_clone() {
 }
 sed -i '/\/etc\/init\.d\/tailscale/d;/\/etc\/config\/tailscale/d;' feeds/packages/net/tailscale/Makefile
 # rm -rf feeds/luci/applications/luci-app-passwall
-rm -rf feeds/packages/net/v2ray-geodata
+rm -rf packages/net/v2ray-geodata
 rm -rf packages/net/adguardhome
 git clone https://github.com/sbwml/luci-app-mosdns -b v5 package/mosdns
 git clone https://github.com/sbwml/v2ray-geodata package/v2ray-geodata
