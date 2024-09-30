@@ -11,15 +11,18 @@ function git_sparse_clone() {
 }
 sed -i '/\/etc\/init\.d\/tailscale/d;/\/etc\/config\/tailscale/d;' feeds/packages/net/tailscale/Makefile
 # rm -rf feeds/luci/applications/luci-app-passwall
-rm -rf feeds/packages/net/v2ray-geodata
+rm -rf packages/net/v2ray-geodata
+rm -rf packages/net/adguardhome
 git clone https://github.com/sbwml/luci-app-mosdns -b v5 package/mosdns
 git clone https://github.com/sbwml/v2ray-geodata package/v2ray-geodata
-git clone --depth=1 https://github.com/ophub/luci-app-amlogic package/amlogic
 git clone https://github.com/morytyann/OpenWrt-mihomo package/luci-app-mihomo
 git clone https://github.com/asvow/luci-app-tailscale package/luci-app-tailscale
+git_sparse_clone master https://github.com/kenzok8/openwrt-packages package/adguardhome package/luci-app-adguardhome  package/luci-theme-alpha package/luci-app-fileassistant package/luci-app-store
+git clone --depth=1 https://github.com/ophub/luci-app-amlogic package/amlogic
 #git clone https://github.com/linkease/istore package/istore/luci-app-store
 #git_sparse_clone master https://github.com/linkease/istore luci/luci-app-store
 #定时限速
+#luci-theme-atmaterial_new luci-theme-ifit
 #git clone https://github.com/sirpdboy/luci-app-eqosplus package/luci-app-eqosplus
 git clone https://github.com/sirpdboy/luci-app-lucky package/lucky
 #git clone -b js https://github.com/sirpdboy/luci-theme-kucat package/luci-theme-kucat
@@ -29,20 +32,31 @@ git clone https://github.com/sirpdboy/luci-app-lucky package/lucky
 #git clone https://github.com/lucikap/luci-app-nettask package/luci-app-nettask
 # 插件
 echo "
+CONFIG_PACKAGE_kmod-ipt-fullconenat=y
+CONFIG_PACKAGE_luci-lib-taskd=y
+CONFIG_PACKAGE_adguardhome=y
+CONFIG_PACKAGE_luci-app-adguardhome=y
+CONFIG_PACKAGE_luci-app-fileassistant=y
+CONFIG_PACKAGE_luci-theme-alpha=y
 CONFIG_PACKAGE_luci-app-lucky=y
 CONFIG_PACKAGE_luci-app-mosdns=y
 CONFIG_PACKAGE_luci-app-mihomo=y
 CONFIG_PACKAGE_luci-app-tailscale=y
 CONFIG_PACKAGE_luci-app-amlogic=y
+CONFIG_PACKAGE_luci-app-store=y
 " >> .config
 #CONFIG_PACKAGE_luci-app-eqosplus=y
 #CONFIG_PACKAGE_luci-theme-kucat=y
 #CONFIG_PACKAGE_luci-app-advancedplus=y
-#CONFIG_PACKAGE_luci-app-store=y
+#
 #CONFIG_PACKAGE_luci-app-oaf=y
 #CONFIG_PACKAGE_luci-app-pushbot=y
 #CONFIG_PACKAGE_luci-app-nettask=y
+#CONFIG_PACKAGE_luci-app-store=y
+#CONFIG_PACKAGE_luci-theme-atmaterial_new=y
+#CONFIG_PACKAGE_luci-theme-ifit=y
 # Default IP
+
 sed -i 's/192.168.1.1/192.168.3.2/g' package/base-files/files/bin/config_generate
 
 # Remove packages
