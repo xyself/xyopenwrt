@@ -17,7 +17,7 @@ git clone https://github.com/sbwml/luci-app-mosdns -b v5 package/mosdns
 git clone https://github.com/sbwml/v2ray-geodata package/v2ray-geodata
 git clone https://github.com/morytyann/OpenWrt-mihomo package/luci-app-mihomo
 git clone https://github.com/asvow/luci-app-tailscale package/luci-app-tailscale
-git_sparse_clone master https://github.com/kenzok8/openwrt-packages adguardhome luci-app-adguardhome  luci-theme-alpha luci-app-fileassistant luci-app-store
+git_sparse_clone master https://github.com/kenzok8/openwrt-packages package/adguardhome package/luci-app-adguardhome  package/luci-theme-alpha package/luci-app-fileassistant package/luci-app-store
 git clone --depth=1 https://github.com/ophub/luci-app-amlogic package/amlogic
 #git clone https://github.com/linkease/istore package/istore/luci-app-store
 #git_sparse_clone master https://github.com/linkease/istore luci/luci-app-store
@@ -32,9 +32,10 @@ git clone https://github.com/sirpdboy/luci-app-lucky package/lucky
 #git clone https://github.com/lucikap/luci-app-nettask package/luci-app-nettask
 # 插件
 echo "
+CONFIG_PACKAGE_kmod-ipt-fullconenat=y
 CONFIG_PACKAGE_luci-lib-taskd=y
 CONFIG_PACKAGE_adguardhome=y
-CONFIG_PACKAGE_luci-adguardhome=y
+CONFIG_PACKAGE_luci-app-adguardhome=y
 CONFIG_PACKAGE_luci-app-fileassistant=y
 CONFIG_PACKAGE_luci-theme-alpha=y
 CONFIG_PACKAGE_luci-app-lucky=y
