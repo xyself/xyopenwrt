@@ -32,7 +32,7 @@ git clone https://github.com/sirpdboy/luci-app-lucky package/lucky
 #git clone https://github.com/lucikap/luci-app-nettask package/luci-app-nettask
 # 插件
 echo "
-CONFIG_PACKAGE_net_adguardhome=y
+CONFIG_PACKAGE_adguardhome=y
 CONFIG_PACKAGE_luci-app-adguardhome=y
 CONFIG_PACKAGE_luci-app-fileassistant=y
 CONFIG_PACKAGE_luci-theme-alpha=y
