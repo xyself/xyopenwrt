@@ -34,7 +34,5 @@ config globals 'globals'
 
 config interface 'tun'
 	option proto 'none'
-	option ifname 'tun'
-	option device 'tun'
+	option device 'mihomo'
 	option auto '0'
-
