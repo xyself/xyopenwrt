@@ -11,18 +11,20 @@ function git_sparse_clone() {
 }
 # rm -rf feeds/luci/applications/luci-app-passwall
 rm -rf feeds/packages/net/v2ray-geodata
+sed -i '/\/etc\/init\.d\/tailscale/d;/\/etc\/config\/tailscale/d;' feeds/packages/net/tailscale/Makefile
 
 git clone https://github.com/sbwml/luci-app-mosdns -b v5 package/mosdns
 git clone https://github.com/sbwml/v2ray-geodata package/v2ray-geodata
 git clone --depth=1 https://github.com/ophub/luci-app-amlogic package/amlogic
 git clone https://github.com/morytyann/OpenWrt-mihomo package/luci-app-mihomo
+git clone https://github.com/asvow/luci-app-tailscale package/luci-app-tailscale
 git_sparse_clone master https://github.com/kenzok8/openwrt-packages luci-app-adguardhome  luci-theme-alpha luci-app-fileassistant
+git clone https://github.com/sirpdboy/luci-app-lucky package/lucky
 #git clone https://github.com/linkease/istore package/istore/luci-app-store
 #git_sparse_clone master https://github.com/linkease/istore luci/luci-app-store
 #定时限速
 #luci-theme-atmaterial_new luci-theme-ifit
 #git clone https://github.com/sirpdboy/luci-app-eqosplus package/luci-app-eqosplus
-git clone https://github.com/sirpdboy/luci-app-lucky package/lucky
 #git clone -b js https://github.com/sirpdboy/luci-theme-kucat package/luci-theme-kucat
 #git clone https://github.com/sirpdboy/luci-app-advancedplus package/luci-app-advancedplus
 #git clone https://github.com/destan19/OpenAppFilter package/OpenAppFilter
@@ -37,7 +39,7 @@ CONFIG_PACKAGE_luci-theme-alpha=y
 CONFIG_PACKAGE_luci-app-lucky=y
 CONFIG_PACKAGE_luci-app-mosdns=y
 CONFIG_PACKAGE_luci-app-mihomo=y
-CONFIG_PACKAGE_tailscale=y
+CONFIG_PACKAGE_luci-app-tailscale=y
 CONFIG_PACKAGE_luci-app-amlogic=y
 " >> .config
 #CONFIG_PACKAGE_luci-app-eqosplus=y
