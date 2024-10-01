@@ -1,4 +1,4 @@
-name: zq N1
+name: zq copy N1
 
 on:
   workflow_dispatch:
@@ -8,13 +8,12 @@ on:
         required: false
         default: 'false'
   schedule:
-    - cron: "0 0 */3 * *"
-
+  #  - cron: "0 0 */3 * *"
 env:
   REPO_URL: https://github.com/immortalwrt/immortalwrt
   REPO_BRANCH: openwrt-23.05
   CONFIG_FILE: N1/.config
-  DIY_SH: N1/duo.sh
+  DIY_SH: N1/duo1.sh
   TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
   TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
   FILES: N1/files
@@ -101,7 +100,7 @@ jobs:
       uses: unifreq/openwrt_packit@master
       env:
         OPENWRT_ARMVIRT: openwrt/bin/targets/*/*/*.tar.gz
-        KERNEL_VERSION_NAME: 6.6.52
+        KERNEL_VERSION_NAME: 6.6.48
         PACKAGE_SOC: diy
         GZIP_IMGS: .xz
         SCRIPT_DIY_PATH: N1/mk_s905d_n1.sh
@@ -128,12 +127,7 @@ jobs:
       if: env.TELEGRAM_TOKEN && ! contains(github.event.action, 'notg')
       continue-on-error: true
       run: |
-          if [[ "${{ job.status }}" == "success" ]]; then
-              message="🎉 OpenWrt ${{ env.VERSION }} ${{ matrix.target }} 编译成功 😋"
-          else
-              message="❌ OpenWrt ${{ env.VERSION }} ${{ matrix.target }} 编译失败，请检查日志！"
-          fi
-          curl -k --data chat_id="${{ env.TELEGRAM_CHAT_ID }}" --data "text=${message}" "https://api.telegram.org/bot${{ env.TELEGRAM_TOKEN }}/sendMessage"
+          curl -k --data chat_id="${{ env.TELEGRAM_CHAT_ID }}" --data "text=🎉 OpenWrt ${{ env.VERSION }} ${{matrix.target}} 编译成功 😋  ${{ env.COWURL }}   ${{ env.WETRANS }} 🚀" "https://api.telegram.org/bot${{ env.TELEGRAM_TOKEN }}/sendMessage"
     - name: Delete old releases
       uses: dev-drprasad/delete-older-releases@master
       env:
