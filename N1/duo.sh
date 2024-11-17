@@ -32,8 +32,7 @@ git clone https://github.com/sirpdboy/luci-app-lucky package/lucky
 #git clone https://github.com/lucikap/luci-app-nettask package/luci-app-nettask
 # 插件
 echo "
-CONFIG_PACKAGE_luci-app-store=y
-CONFIG_PACKAGE_luci-app-adguardhome=y
+
 CONFIG_PACKAGE_luci-theme-alpha=y
 CONFIG_PACKAGE_luci-app-lucky=y
 CONFIG_PACKAGE_luci-app-mosdns=y
@@ -42,6 +41,8 @@ CONFIG_PACKAGE_luci-app-tailscale=y
 CONFIG_PACKAGE_luci-app-amlogic=y
 CONFIG_PACKAGE_luci-app-fileassistant=y
 " >> .config
+#CONFIG_PACKAGE_luci-app-store=y
+#CONFIG_PACKAGE_luci-app-adguardhome=y
 #CONFIG_PACKAGE_adguardhome=y
 #CONFIG_PACKAGE_luci-app-fileassistant=y
 #CONFIG_PACKAGE_luci-app-eqosplus=y
