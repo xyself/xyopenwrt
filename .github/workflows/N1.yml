@@ -1,35 +1,34 @@
-name: N1
+name: N1  # 工作流名称
 
 on:
-  workflow_dispatch:
+  workflow_dispatch:  # 手动触发
    inputs:
       ssh:
-        description: 'SSH connection to Actions'
+        description: 'SSH 连接到 Actions'
         required: false
         default: 'false'
   schedule:
-    - cron: "0 0 */3 * *"
+    - cron: "0 0 */3 * *"  # 每 3 天运行一次
 
 env:
-  REPO_URL: https://github.com/immortalwrt/immortalwrt
-  REPO_BRANCH: openwrt-24.10
-  CONFIG_FILE: N1/.config
-  DIY_SH: N1/diy.sh
-  TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
-  TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-  FILES: N1/files
-  TZ: Asia/Shanghai
+  REPO_URL: https://github.com/immortalwrt/immortalwrt  # OpenWrt 源码仓库
+  REPO_BRANCH: openwrt-24.10  # 指定分支
+  CONFIG_FILE: N1/.config  # 配置文件路径
+  DIY_SH: N1/diy.sh  # 自定义脚本
+  TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}  # Telegram 机器人令牌
+  TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}  # Telegram 频道 ID
+  FILES: N1/files  # 额外文件
+  TZ: Asia/Shanghai  # 时区设置
   
-
 jobs:
   build:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-24.04  # 运行环境
 
     steps:
-    - name: Checkout
+    - name: 检出代码
       uses: actions/checkout@main
 
-    - name: Free up space
+    - name: 释放磁盘空间
       uses: jlumbroso/free-disk-space@main
       with:
         tool-cache: false
@@ -40,7 +39,7 @@ jobs:
         docker-images: true
         swap-storage: true
 
-    - name: Initialize environment
+    - name: 初始化环境
       env:
         DEBIAN_FRONTEND: noninteractive
       run: |
@@ -52,13 +51,13 @@ jobs:
         sudo mkdir -p /workdir
         sudo chown $USER:$GROUPS /workdir
 
-    - name: Clone source code
+    - name: 克隆 OpenWrt 源码
       working-directory: /workdir
       run: |
         git clone $REPO_URL -b $REPO_BRANCH --single-branch --depth=1 openwrt
         ln -sf /workdir/openwrt $GITHUB_WORKSPACE/openwrt
 
-    - name: Update & Install feeds
+    - name: 更新并安装 feeds
       run: |
         chmod +x $DIY_SH
         cd openwrt
@@ -69,16 +68,16 @@ jobs:
         ./scripts/feeds install -a
         ./scripts/feeds install -a
 
-    - name: Load custom config
+    - name: 加载自定义配置
       run: |
         [ -e $FILES ] && mv $FILES openwrt/files
         [ -e $CONFIG_FILE ] && mv $CONFIG_FILE openwrt/.config
 
-    - name: SSH connect to Actions
+    - name: SSH 连接到 Actions
       uses: P3TERX/ssh2actions@main
       if: (github.event.inputs.ssh == 'true') || contains(github.event.action, 'ssh')
 
-    - name: Download package
+    - name: 下载依赖包
       working-directory: ./openwrt
       run: |
         make defconfig
@@ -86,15 +85,15 @@ jobs:
         find dl -size -1024c -exec ls -l {} \;
         find dl -size -1024c -exec rm -f {} \;
 
-    - name: Compile the firmware
+    - name: 编译固件
       run: |
         chmod -R 755 openwrt
         cd openwrt
-        echo -e "$(nproc) thread compile"
+        echo -e "$(nproc) 线程编译"
         make -j$(nproc) || make -j1 || make -j1 V=s
         echo "compile_status=success" >> $GITHUB_ENV
 
-    - name: Package armsr as openwrt
+    - name: 打包 ARM 版本 OpenWrt
       if: ${{ env.compile_status }} == 'success' && !cancelled()
       uses: unifreq/openwrt_packit@master
       env:
@@ -109,7 +108,7 @@ jobs:
         SFE_FLOW: 0
         ENABLE_WIFI_K510: 0
 
-    - name: Upload firmware to release
+    - name: 上传固件到 Release
       uses: softprops/action-gh-release@master
       if: ${{ env.PACKAGED_STATUS == 'success' }} && !cancelled()
       env:
@@ -118,12 +117,13 @@ jobs:
         tag_name: OpenWrt_${{ env.PACKAGED_OUTPUTDATE }}
         files: ${{ env.PACKAGED_OUTPUTPATH }}/*.img.xz
         body: |
-          首次使用建议全新刷写
+          **首次使用建议全新刷写**
           * 基本信息
-          IP: 192.168.3.2
-          账户: root
-          密码: password
-    - name: Telegram notification
+          - IP: 192.168.3.2
+          - 账户: root
+          - 密码: password
+
+    - name: 发送 Telegram 通知
       if: env.TELEGRAM_TOKEN != '' && github.event.action != 'notg'
       continue-on-error: true 
       run: |
@@ -134,10 +134,10 @@ jobs:
         fi
         curl -k --data chat_id="${{ env.TELEGRAM_CHAT_ID }}" --data "text=${message}" "https://api.telegram.org/bot${{ env.TELEGRAM_TOKEN }}/sendMessage"
 
-    - name: Delete old releases
+    - name: 删除旧的 Releases
       uses: dev-drprasad/delete-older-releases@master
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        keep_latest: 6
-        delete_tags : true
+        keep_latest: 6  # 保留最近 6 个发布
+        delete_tags: true  # 删除对应的 Tag
