@@ -14,7 +14,8 @@ env:
   REPO_URL: https://github.com/immortalwrt/immortalwrt  # OpenWrt 源码仓库
   REPO_BRANCH: openwrt-24.10  # 指定分支
   TZ: Asia/Shanghai  # 时区设置
-
+  TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}  # 从 GitHub Secrets 获取 Telegram Bot Token
+  TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}  # 从 GitHub Secrets 获取 Telegra
 jobs:
   build:
     runs-on: ubuntu-24.04  # 运行环境
