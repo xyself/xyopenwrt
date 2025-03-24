@@ -31,7 +31,7 @@ jobs:
     - name: 释放磁盘空间
       uses: jlumbroso/free-disk-space@main
       with:
-        tool-cache: true
+        tool-cache: false
         android: true
         dotnet: true
         haskell: true
@@ -54,16 +54,12 @@ jobs:
     - name: 克隆 OpenWrt 源码
       working-directory: /workdir
       run: |
+        df -hT $PWD
         git clone $REPO_URL -b $REPO_BRANCH --single-branch --depth=1 openwrt
         ln -sf /workdir/openwrt $GITHUB_WORKSPACE/openwrt
 
     - name: 更新并安装 feeds
       run: |
-        chmod +x $DIY_SH
-        cd openwrt
-        ./scripts/feeds update -a
-        ./scripts/feeds install -a
-        $GITHUB_WORKSPACE/$DIY_SH
         ./scripts/feeds update -a
         ./scripts/feeds install -a
 
@@ -71,6 +67,9 @@ jobs:
       run: |
         [ -e $FILES ] && mv $FILES openwrt/files
         [ -e $CONFIG_FILE ] && mv $CONFIG_FILE openwrt/.config
+        chmod +x $DIY_SH
+        cd openwrt
+        $GITHUB_WORKSPACE/$DIY_SH				
 
     - name: SSH 连接到 Actions
       uses: P3TERX/ssh2actions@main
@@ -99,27 +98,49 @@ jobs:
         OPENWRT_ARMVIRT: openwrt/bin/targets/*/*/*.tar.gz
         KERNEL_REPO_URL: breakingbadboy/OpenWrt
         KERNEL_VERSION_NAME: 6.6.y
-        PACKAGE_SOC: diy
+        PACKAGE_SOC: s905d
         GZIP_IMGS: .xz
         SCRIPT_DIY_PATH: N1/mk_s905d_n1.sh
         WHOAMI: xyself
+        OPENWRT_VER: $(date +"%Y.%m.%d")
         SW_FLOWOFFLOAD: 0
         SFE_FLOW: 0
 
-    - name: 上传固件到 Release
-      uses: softprops/action-gh-release@master
+
+    - name: 生成发布标签
+											  
       if: ${{ env.PACKAGED_STATUS == 'success' }} && !cancelled()
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        echo "release_tag=$(date +"%Y.%m.%d-%H.%M")" >> ${GITHUB_OUTPUT}
+        touch release.txt
+        echo "
+        🍁 注意事项：首次使用建议全新刷写
+          
+        💻 适用机型: 斐讯N1
+
+        📂 源码: ${{ env.REPO_URL }}
+
+        🌳 分支: ${{ env.REPO_BRANCH }}
+
+        ⏱️ 编译时间: $(date +"%Y年%m月%d日%H时%M分")
+
+        🌐 管理地址: 192.168.3.2
+
+        👤 用户名: root
+
+        🔒 密码: password 
+        
+        " >> release.txt
+        echo "tag_status=success" >> $GITHUB_ENV
+
+    - name: 发布固件到 Releases
+      uses: softprops/action-gh-release@v2
+      if: ${{ env.tag_status == 'success' }} && !cancelled()
       with:
         tag_name: OpenWrt_${{ env.PACKAGED_OUTPUTDATE }}
         files: ${{ env.PACKAGED_OUTPUTPATH }}/*.img.xz
-        body: |
-          **首次使用建议全新刷写**
-          * 基本信息
-          - IP: 192.168.3.2
-          - 账户: root
-          - 密码: password
+        body_path: release.txt
+        token: ${{ env.GITHUB_TOKEN }}
 
     - name: 发送 Telegram 通知
       if: env.TELEGRAM_TOKEN != '' && github.event.action != 'notg'
@@ -137,5 +158,5 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        keep_latest: 6  # 保留最近 6 个发布
+        keep_latest: 8  # 保留最近 6 个发布
         delete_tags: true  # 删除对应的 Tag
