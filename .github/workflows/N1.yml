@@ -4,21 +4,21 @@ on:
   workflow_dispatch:  # 手动触发
    inputs:
       ssh:
-        description: 'SSH 连接到 Actions'
+        description: 'SSH connection to Actions'
         required: false
         default: 'false'
   schedule:
     - cron: "0 0 */3 * *"  # 每 3 天运行一次
 
 env:
-  REPO_URL: https://github.com/immortalwrt/immortalwrt  # OpenWrt 源码仓库
-  REPO_BRANCH: openwrt-24.10  # 指定分支
-  CONFIG_FILE: N1/.config  # 配置文件路径
-  DIY_SH: N1/diy.sh  # 自定义脚本
-  TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}  # Telegram 机器人令牌
-  TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}  # Telegram 频道 ID
-  FILES: N1/files  # 额外文件
-  TZ: Asia/Shanghai  # 时区设置
+  REPO_URL: https://github.com/immortalwrt/immortalwrt
+  REPO_BRANCH: openwrt-24.10
+  CONFIG_FILE: N1/.config
+  DIY_SH: N1/diy.sh
+  TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+  TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+  FILES: N1/files
+  TZ: Asia/Shanghai
   
 jobs:
   build:
@@ -31,7 +31,7 @@ jobs:
     - name: 释放磁盘空间
       uses: jlumbroso/free-disk-space@main
       with:
-        tool-cache: false
+        tool-cache: true
         android: true
         dotnet: true
         haskell: true
@@ -66,7 +66,6 @@ jobs:
         $GITHUB_WORKSPACE/$DIY_SH
         ./scripts/feeds update -a
         ./scripts/feeds install -a
-        ./scripts/feeds install -a
 
     - name: 加载自定义配置
       run: |
@@ -89,7 +88,7 @@ jobs:
       run: |
         chmod -R 755 openwrt
         cd openwrt
-        echo -e "$(nproc) 线程编译"
+        echo -e "$(nproc) thread compile"
         make -j$(nproc) || make -j1 || make -j1 V=s
         echo "compile_status=success" >> $GITHUB_ENV
 
@@ -106,7 +105,6 @@ jobs:
         WHOAMI: xyself
         SW_FLOWOFFLOAD: 0
         SFE_FLOW: 0
-        ENABLE_WIFI_K510: 0
 
     - name: 上传固件到 Release
       uses: softprops/action-gh-release@master

@@ -9,6 +9,17 @@ function git_sparse_clone() {
   mv -f $@ ../package
   cd .. && rm -rf $repodir
 }
+# 删除自定义源默认的 argon 主题
+rm -rf package/lean/luci-theme-argon
+
+# 部分第三方源自带 argon 主题，上面命令删除不掉的请运行下面命令
+find ./ -name luci-theme-argon | xargs rm -rf;
+
+# 针对 LEDE 项目拉取 argon 原作者的源码
+git clone https://github.com/jerrykuku/luci-theme-argon.git package/lean/luci-theme-argon
+
+# 替换默认主题为 luci-theme-argon
+sed -i 's/luci-theme-bootstrap/luci-theme-argon/' feeds/luci/collections/luci/Makefile
 # rm -rf feeds/luci/applications/luci-app-passwall
 rm -rf feeds/packages/net/v2ray-geodata
 sed -i '/\/etc\/init\.d\/tailscale/d;/\/etc\/config\/tailscale/d;' feeds/packages/net/tailscale/Makefile
