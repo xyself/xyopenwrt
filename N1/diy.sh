@@ -2,12 +2,15 @@
 #!/bin/bash
 
 function git_sparse_clone() {
+  set -x  # 启用调试模式
   branch="$1" repourl="$2" && shift 2
   git clone --depth=1 -b $branch --single-branch --filter=blob:none --sparse $repourl
   repodir=$(echo $repourl | awk -F '/' '{print $(NF)}')
-  cd $repodir && git sparse-checkout set $@
-  mv -f $@ ../package
+  cd $repodir || exit 127  # 这里加 `exit 127` 确保目录存在
+  git sparse-checkout set $@
+  mv -f $@ ../package || exit 127  # 如果移动失败，则报错退出
   cd .. && rm -rf $repodir
+  set +x  # 关闭调试模式
 }
 
 # rm -rf feeds/luci/applications/luci-app-passwall
