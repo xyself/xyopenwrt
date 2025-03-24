@@ -108,7 +108,6 @@ jobs:
 
 
     - name: 生成发布标签
-											  
       if: ${{ env.PACKAGED_STATUS == 'success' }} && !cancelled()
       run: |
         echo "release_tag=$(date +"%Y.%m.%d-%H.%M")" >> ${GITHUB_OUTPUT}
