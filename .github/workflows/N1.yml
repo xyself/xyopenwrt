@@ -60,7 +60,7 @@ jobs:
    
     
     - name: Update & Install feeds
-      working-directory: /workdir
+      working-directory: ./openwrt
       run: |
        chmod +x $DIY_SH
        cd openwrt
