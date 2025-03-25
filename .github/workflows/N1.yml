@@ -17,6 +17,7 @@ env:
   DIY_SH: N1/diy.sh
   TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
   TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   FILES: N1/files
   TZ: Asia/Shanghai
   
