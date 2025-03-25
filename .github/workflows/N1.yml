@@ -57,19 +57,15 @@ jobs:
         df -hT $PWD
         git clone $REPO_URL -b $REPO_BRANCH --single-branch --depth=1 openwrt
         ln -sf /workdir/openwrt $GITHUB_WORKSPACE/openwrt
-
-    - name: 更新并安装 feeds
+    - name: Update & Install feeds
       run: |
-        ./scripts/feeds update -a
-        ./scripts/feeds install -a
-
-    - name: 加载自定义配置
-      run: |
-        [ -e $FILES ] && mv $FILES openwrt/files
-        [ -e $CONFIG_FILE ] && mv $CONFIG_FILE openwrt/.config
-        chmod +x $DIY_SH
-        cd openwrt
-        $GITHUB_WORKSPACE/$DIY_SH				
+       chmod +x $DIY_SH
+       cd openwrt
+       ./scripts/feeds update -a
+       ./scripts/feeds install -a
+       $GITHUB_WORKSPACE/$DIY_SH
+       ./scripts/feeds update -a
+       ./scripts/feeds install -a  # 仅执行 install，避免不必要的 update				
 
     - name: SSH 连接到 Actions
       uses: P3TERX/ssh2actions@main
