@@ -57,7 +57,10 @@ jobs:
         df -hT $PWD
         git clone $REPO_URL -b $REPO_BRANCH --single-branch --depth=1 openwrt
         ln -sf /workdir/openwrt $GITHUB_WORKSPACE/openwrt
+   
+    
     - name: Update & Install feeds
+      working-directory: /workdir
       run: |
        chmod +x $DIY_SH
        cd openwrt
