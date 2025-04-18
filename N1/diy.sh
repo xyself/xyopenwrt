@@ -23,6 +23,9 @@ git clone https://github.com/nikkinikki-org/OpenWrt-nikki package/luci-app-nikki
 git clone https://github.com/asvow/luci-app-tailscale package/luci-app-tailscale
 git_sparse_clone master https://github.com/kenzok8/openwrt-packages luci-theme-alpha luci-app-fileassistant
 git clone https://github.com/sirpdboy/luci-app-lucky package/lucky
+git clone https://github.com/destan19/OpenAppFilter.git package/OpenAppFilter
+
+
 #git clone https://github.com/linkease/istore package/istore/luci-app-store
 #git_sparse_clone master https://github.com/linkease/istore luci/luci-app-store
 #定时限速
@@ -36,7 +39,7 @@ git clone https://github.com/sirpdboy/luci-app-lucky package/lucky
 #git clone https://github.com/linkease/istore package/istore
 # 插件
 echo "
-
+CONFIG_PACKAGE_luci-app-oaf=y
 CONFIG_PACKAGE_luci-theme-alpha=y
 CONFIG_PACKAGE_luci-app-lucky=y
 CONFIG_PACKAGE_luci-app-mosdns=y
