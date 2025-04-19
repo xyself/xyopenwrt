@@ -38,7 +38,6 @@ git clone https://github.com/sirpdboy/luci-app-lucky package/lucky
 #git clone https://github.com/linkease/istore package/istore
 # 插件
 echo "
-CONFIG_PACKAGE_luci-app-oaf=y
 CONFIG_PACKAGE_luci-theme-alpha=y
 CONFIG_PACKAGE_luci-app-lucky=y
 CONFIG_PACKAGE_luci-app-mosdns=y
