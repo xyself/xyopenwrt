@@ -23,7 +23,6 @@ git clone https://github.com/nikkinikki-org/OpenWrt-nikki package/luci-app-nikki
 git clone https://github.com/asvow/luci-app-tailscale package/luci-app-tailscale
 git_sparse_clone master https://github.com/kenzok8/openwrt-packages luci-theme-alpha luci-app-fileassistant
 git clone https://github.com/sirpdboy/luci-app-lucky package/lucky
-git clone https://github.com/destan19/OpenAppFilter package/OpenAppFilter
 
 
 #git clone https://github.com/linkease/istore package/istore/luci-app-store
