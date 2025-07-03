@@ -100,8 +100,10 @@ jobs:
       if: ${{ env.compile_status }} == 'success' && !cancelled()
       uses: unifreq/openwrt_packit@master
       env:
-        OPENWRT_ARMVIRT: openwrt/bin/targets/*/*/*.tar.gz
-        KERNEL_REPO_URL: breakingbadboy/OpenWrt
+        OPENWRT_ARMVIRT: https://github.com/*/releases/*/*.tar.gz
+#openwrt/bin/targets/*/*/*.tar.gz
+        KERNEL_REPO_URL: ophub/amlogic-s9xxx-openwrt
+#breakingbadboy/OpenWrt
         KERNEL_VERSION_NAME: 6.6.y
         PACKAGE_SOC: s905d
         GZIP_IMGS: .xz
