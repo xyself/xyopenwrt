@@ -28,8 +28,8 @@ jobs:
         env:
           compile_status: success
           OPENWRT_ARMVIRT: openwrt/bin/targets/*/*/*.tar.gz
-          KERNEL_REPO_URL: ophub/amlogic-s9xxx-openwrt   # 替换为 ophub 内核
-          KERNEL_VERSION_NAME: 6.6.32                     # 必须和 release tag 一致
+          KERNEL_REPO_URL: ophub/kernel
+          KERNEL_VERSION_NAME: 6.6.y                    # 必须和 release tag 一致
           PACKAGE_SOC: s905d
           GZIP_IMGS: .xz
           SCRIPT_DIY_PATH: N1/mk_s905d_n1.sh
