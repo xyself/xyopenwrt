@@ -1,3 +1,10 @@
+name: Test OpenWrt Packit Kernel Version
+
+on: workflow_dispatch  # 允许手动触发
+
+env:
+  ACTIONS_STEP_DEBUG: true
+
 jobs:
   test-pack:
     runs-on: ubuntu-latest
