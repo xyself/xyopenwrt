@@ -1,0 +1,42 @@
+name: Test OpenWrt ARM 打包（最小测试）
+
+on:
+  workflow_dispatch:  # 手动触发
+
+jobs:
+  test-pack:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: 准备 RootFS（模拟已编译）
+        run: |
+          mkdir -p openwrt/bin/targets/armvirt/64
+          wget -O openwrt/bin/targets/armvirt/64/openwrt-armvirt-64-generic-rootfs.tar.gz \
+            https://github.com/ophub/amlogic-s9xxx-openwrt/releases/download/6.6.32/openwrt-armvirt-64-generic-rootfs.tar.gz
+
+      - name: 准备 DIY 脚本
+        run: |
+          mkdir -p N1
+          echo '#!/bin/bash' > N1/mk_s905d_n1.sh
+          chmod +x N1/mk_s905d_n1.sh
+
+      - name: 打包 ARM 版本 OpenWrt
+        uses: unifreq/openwrt_packit@master
+        env:
+          compile_status: success
+          OPENWRT_ARMVIRT: openwrt/bin/targets/*/*/*.tar.gz
+          KERNEL_REPO_URL: ophub/amlogic-s9xxx-openwrt   # 替换为 ophub 内核
+          KERNEL_VERSION_NAME: 6.6.32                     # 必须和 release tag 一致
+          PACKAGE_SOC: s905d
+          GZIP_IMGS: .xz
+          SCRIPT_DIY_PATH: N1/mk_s905d_n1.sh
+          WHOAMI: xyself
+          OPENWRT_VER: "2025.07.03"
+          SW_FLOWOFFLOAD: 0
+          SFE_FLOW: 0
+
+      - name: 查看输出结果
+        run: ls -lh
