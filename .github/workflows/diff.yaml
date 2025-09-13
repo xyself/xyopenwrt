@@ -1,4 +1,4 @@
-name: N1 Generate diffconfig
+name: N1  # 工作流名称
 
 on:
   workflow_dispatch:  # 手动触发
@@ -8,79 +8,110 @@ on:
         required: false
         default: 'false'
   schedule:
-    - cron: "0 0 */7 * *"  # 每 7 天运行一次
+    - cron: "0 0 */7 * *"  # 每 3 天运行一次
 
 env:
   REPO_URL: https://github.com/immortalwrt/immortalwrt
   REPO_BRANCH: openwrt-24.10
   DIY_SH: N1/diy.sh
-  FILES: N1/files
   TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
   TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  FILES: N1/files
   TZ: Asia/Shanghai
 
 jobs:
-  diff:
-    runs-on: ubuntu-24.04
+  build:
+    runs-on: ubuntu-24.04  # 运行环境
 
     steps:
-    - name: 检出源码
+    - name: 检出代码
       uses: actions/checkout@main
 
-    - name: 初始化环境
-      run: |
-        sudo apt-get update -y
-        sudo apt-get install -y git
-        sudo timedatectl set-timezone "$TZ"
-        mkdir -p /workdir/diff
-        mkdir -p /workdir/openwrt
+    - name: 释放磁盘空间
+      uses: jlumbroso/free-disk-space@main
+      with:
+        tool-cache: false
+        android: true
+        dotnet: true
+        haskell: true
+        large-packages: true
+        docker-images: true
+        swap-storage: true
 
-    - name: 克隆 OpenWrt 源码
+    - name: 初始化环境
+      env:
+        DEBIAN_FRONTEND: noninteractive
+      run: |
+        sudo -E apt-get update -y
+        sudo -E apt-get full-upgrade -y
+        sudo -E apt-get install -y $(curl -fsSL https://raw.githubusercontent.com/nantayo/My-Pkg/master/2410)
+        sudo -E apt-get autoremove --purge
+        sudo -E apt-get clean
+        sudo timedatectl set-timezone "$TZ"
+        sudo mkdir -p /workdir
+        sudo chown $USER:$GROUPS /workdir
+
+    - name: 克隆源码
       working-directory: /workdir
-      run: git clone $REPO_URL -b $REPO_BRANCH --single-branch --depth=1 openwrt
+      run: |
+        df -hT $PWD
+        git clone $REPO_URL -b $REPO_BRANCH --single-branch --depth=1 openwrt
+        ln -sf /workdir/openwrt $GITHUB_WORKSPACE/openwrt
+
+    - name: 更新 & 安装 feeds
+      working-directory: ./openwrt
+      run: |
+        ./scripts/feeds update -a
+        ./scripts/feeds install -a
 
     - name: 加载自定义配置
       run: |
-        [ -e $FILES ] && mv $FILES /workdir/openwrt/files
+        [ -e $FILES ] && mv $FILES openwrt/files
         chmod +x $DIY_SH
-        cd /workdir/openwrt
+        cd openwrt
         $GITHUB_WORKSPACE/$DIY_SH
 
-    - name: SSH 上传差异文件
+    - name: SSH 连接到 Actions
       uses: P3TERX/ssh2actions@main
+      if: github.event.inputs.ssh == 'true' || contains(github.event.action, 'ssh')
+
+    - name: 生成精简 .config
       if: github.event.inputs.ssh == 'true'
-      with:
-        host: ${{ secrets.SSH_HOST }}
-        username: ${{ secrets.SSH_USER }}
-        key: ${{ secrets.SSH_KEY }}
-        source: /remote/path/to/.config
-        target: /workdir/diff/.config
-
-    - name: 生成 diffconfig
+      working-directory: ./openwrt
       run: |
-        cp /workdir/diff/.config /workdir/openwrt/.config
-        cd /workdir/openwrt
         make defconfig
-        scripts/diffconfig.sh > /workdir/diff/diffconfig.txt
-        echo "生成 diffconfig:"
-        cat /workdir/diff/diffconfig.txt
+        scripts/kconfig/merge_config.sh -r .config
+        echo "精简 .config 已生成"
 
-    - name: 发布到 GitHub Release
-      uses: softprops/action-gh-release@v2
-      with:
-        tag_name: diffconfig_$(date +'%Y%m%d%H%M')
-        files: /workdir/diff/diffconfig.txt
-        token: ${{ env.GITHUB_TOKEN }}
-
-    - name: 发送到 Telegram
-      if: env.TELEGRAM_TOKEN != ''
+    - name: 生成 OpenWrt 差异文件
+      if: github.event.inputs.ssh == 'true'
+      working-directory: ./openwrt
       run: |
-        DIFF_FILE=/workdir/diff/diffconfig.txt
-        curl -s -X POST "https://api.telegram.org/bot${{ env.TELEGRAM_TOKEN }}/sendMessage" \
-          -d chat_id="${{ env.TELEGRAM_CHAT_ID }}" \
-          -d text="🎉 diffconfig 已生成并上传到 GitHub Release"
-        curl -s -X POST "https://api.telegram.org/bot${{ env.TELEGRAM_TOKEN }}/sendDocument" \
-          -F chat_id="${{ env.TELEGRAM_CHAT_ID }}" \
-          -F document=@"$DIFF_FILE" \
-          -F caption="diffconfig 文件"
+        git diff > diff_openwrt.patch
+        echo "差异文件生成完毕: diff_openwrt.patch"
+
+    - name: 提交差异文件到 GitHub
+      if: github.event.inputs.ssh == 'true'
+      working-directory: ./openwrt
+      run: |
+        git config user.name "github-actions"
+        git config user.email "actions@github.com"
+        git add diff_openwrt.patch
+        git commit -m "自动提交 OpenWrt 差异文件 [ci skip]" || echo "没有变化可提交"
+        git push origin HEAD:${{ github.ref }}
+
+- name: 发送 Telegram 通知与差异文件
+  if: env.TELEGRAM_TOKEN != '' && github.event.inputs.ssh == 'true'
+  working-directory: ./openwrt
+  run: |
+    # 发送文本消息
+    curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage" \
+      -d chat_id=${TELEGRAM_CHAT_ID} \
+      -d text="N1 工作流完成，OpenWrt 差异文件已生成并提交到 GitHub。"
+
+    # 发送差异文件作为附件
+    curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendDocument" \
+      -F chat_id=${TELEGRAM_CHAT_ID} \
+      -F document=@diff_openwrt.patch \
+      -F caption="OpenWrt 精简差异文件 diff_openwrt.patch"
