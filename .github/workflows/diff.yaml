@@ -1,8 +1,8 @@
-name: diff
+name: diffdd  # 工作流名称
 
 on:
   workflow_dispatch:  # 手动触发
-    inputs:
+   inputs:
       ssh:
         description: 'SSH connection to Actions'
         required: false
@@ -19,7 +19,7 @@ env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   FILES: N1/files
   TZ: Asia/Shanghai
-
+  
 jobs:
   build:
     runs-on: ubuntu-24.04  # 运行环境
@@ -52,6 +52,8 @@ jobs:
         sudo mkdir -p /workdir
         sudo chown $USER:$GROUPS /workdir
 
+   
+
     - name: 克隆源码
       working-directory: /workdir
       run: |
@@ -74,7 +76,7 @@ jobs:
 
     - name: SSH 连接到 Actions
       uses: P3TERX/ssh2actions@main
-      if: github.event.inputs.ssh == 'true' || contains(github.event.action, 'ssh')
+      if: (github.event.inputs.ssh == 'true') || contains(github.event.action, 'ssh')
 
     - name: 生成精简 .config
       if: github.event.inputs.ssh == 'true'
