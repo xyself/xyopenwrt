@@ -103,17 +103,17 @@ jobs:
         git commit -m "自动提交 OpenWrt 差异文件 [ci skip]" || echo "没有变化可提交"
         git push origin HEAD:${{ github.ref }}
 
-- name: 发送 Telegram 通知与差异文件
-  if: env.TELEGRAM_TOKEN != '' && github.event.inputs.ssh == 'true'
-  working-directory: ./openwrt
-  run: |
-    # 发送文本消息
-    curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage" \
-      -d chat_id=${TELEGRAM_CHAT_ID} \
-      -d text="N1 工作流完成，OpenWrt 差异文件已生成并提交到 GitHub。"
+    - name: 发送 Telegram 通知与差异文件
+      if: env.TELEGRAM_TOKEN != '' && github.event.inputs.ssh == 'true'
+      working-directory: ./openwrt
+      run: |
+        # 发送文本消息
+        curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage" \
+          -d chat_id=${TELEGRAM_CHAT_ID} \
+          -d text="N1 工作流完成，OpenWrt 差异文件已生成并提交到 GitHub。"
 
-    # 发送差异文件作为附件
-    curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendDocument" \
-      -F chat_id=${TELEGRAM_CHAT_ID} \
-      -F document=@diff_openwrt.patch \
-      -F caption="OpenWrt 精简差异文件 diff_openwrt.patch"
+        # 发送差异文件作为附件
+        curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendDocument" \
+          -F chat_id=${TELEGRAM_CHAT_ID} \
+          -F document=@diff_openwrt.patch \
+          -F caption="OpenWrt 精简差异文件 diff_openwrt.patch"
