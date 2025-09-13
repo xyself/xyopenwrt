@@ -1,4 +1,4 @@
-name: N1  # 工作流名称
+name: diff
 
 on:
   workflow_dispatch:  # 手动触发
