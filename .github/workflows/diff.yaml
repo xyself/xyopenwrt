@@ -28,16 +28,6 @@ jobs:
     - name: 检出代码
       uses: actions/checkout@main
 
-    - name: 释放磁盘空间
-      uses: jlumbroso/free-disk-space@main
-      with:
-        tool-cache: false
-        android: true
-        dotnet: true
-        haskell: true
-        large-packages: true
-        docker-images: true
-        swap-storage: true
 
     - name: 初始化环境
       env:
@@ -75,7 +65,7 @@ jobs:
         $GITHUB_WORKSPACE/$DIY_SH
 
     - name: SSH 连接到 Actions
-      uses: P3TERX/ssh2actions@main
+      uses: mxschmitt/action-tmate@v3
       if: (github.event.inputs.ssh == 'true') || contains(github.event.action, 'ssh')
 
     - name: 生成精简 .config
