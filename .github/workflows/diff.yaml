@@ -65,8 +65,11 @@ jobs:
         $GITHUB_WORKSPACE/$DIY_SH
 
     - name: SSH 连接到 Actions
-      uses: mxschmitt/action-tmate@v3
+      uses: owenthereal/action-upterm@v1
       if: (github.event.inputs.ssh == 'true') || contains(github.event.action, 'ssh')
+      with:
+        wait-timeout-minutes: 20
+        output-session-url: true
 
     - name: 生成精简 .config
       if: github.event.inputs.ssh == 'true'
