@@ -7,18 +7,21 @@ on:
         description: 'SSH connection to Actions'
         required: false
         default: 'false'
+  schedule:
+    - cron: "0 0 */7 * *"  # 每 7 天运行一次
 
 env:
   REPO_URL: https://github.com/immortalwrt/immortalwrt
   REPO_BRANCH: openwrt-24.10
-  DIFFCONFIG_DIR: diffconfig
+  DIY_SH: N1/diy.sh
+  FILES: N1/files
   TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
   TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   TZ: Asia/Shanghai
 
 jobs:
-  generate_diff:
+  diff:
     runs-on: ubuntu-24.04
 
     steps:
@@ -30,46 +33,53 @@ jobs:
         sudo apt-get update -y
         sudo apt-get install -y git
         sudo timedatectl set-timezone "$TZ"
-        mkdir -p /workdir
+        mkdir -p /workdir/diff
+        mkdir -p /workdir/openwrt
 
     - name: 克隆 OpenWrt 源码
       working-directory: /workdir
       run: git clone $REPO_URL -b $REPO_BRANCH --single-branch --depth=1 openwrt
 
-    - name: SSH 连接上传 diffconfig
+    - name: 加载自定义配置
+      run: |
+        [ -e $FILES ] && mv $FILES /workdir/openwrt/files
+        chmod +x $DIY_SH
+        cd /workdir/openwrt
+        $GITHUB_WORKSPACE/$DIY_SH
+
+    - name: SSH 上传差异文件
       uses: P3TERX/ssh2actions@main
       if: github.event.inputs.ssh == 'true'
       with:
-        # 配置 SSH host、user、key 等
-        # 上传 diffconfig 到 /workdir/diffconfig/.config
+        host: ${{ secrets.SSH_HOST }}
+        username: ${{ secrets.SSH_USER }}
+        key: ${{ secrets.SSH_KEY }}
+        source: /remote/path/to/.config
+        target: /workdir/diff/.config
 
-    - name: 生成差异文件
+    - name: 生成 diffconfig
       run: |
-        mkdir -p /workdir/diff
-        cp /workdir/diffconfig/.config /workdir/openwrt/.config
+        cp /workdir/diff/.config /workdir/openwrt/.config
         cd /workdir/openwrt
         make defconfig
-        # 生成差异文件，只包含修改部分
         scripts/diffconfig.sh > /workdir/diff/diffconfig.txt
-        ls -l /workdir/diff/
+        echo "生成 diffconfig:"
+        cat /workdir/diff/diffconfig.txt
 
-    - name: 发布差异文件到 GitHub Release
+    - name: 发布到 GitHub Release
       uses: softprops/action-gh-release@v2
       with:
-        tag_name: diffconfig_$(date +'%Y%m%d')
+        tag_name: diffconfig_$(date +'%Y%m%d%H%M')
         files: /workdir/diff/diffconfig.txt
         token: ${{ env.GITHUB_TOKEN }}
 
-    - name: 发送 diffconfig 到 Telegram
+    - name: 发送到 Telegram
       if: env.TELEGRAM_TOKEN != ''
       run: |
         DIFF_FILE=/workdir/diff/diffconfig.txt
-        TELEGRAM_MSG="🎉 diffconfig 已生成并上传到 GitHub Release"
-        # 发送文本消息
         curl -s -X POST "https://api.telegram.org/bot${{ env.TELEGRAM_TOKEN }}/sendMessage" \
           -d chat_id="${{ env.TELEGRAM_CHAT_ID }}" \
-          -d text="$TELEGRAM_MSG"
-        # 发送差异文件
+          -d text="🎉 diffconfig 已生成并上传到 GitHub Release"
         curl -s -X POST "https://api.telegram.org/bot${{ env.TELEGRAM_TOKEN }}/sendDocument" \
           -F chat_id="${{ env.TELEGRAM_CHAT_ID }}" \
           -F document=@"$DIFF_FILE" \
