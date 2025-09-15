@@ -8,7 +8,7 @@ on:
         required: false
         default: 'false'
   schedule:
-    - cron: "0 0 */7 * *"  # 每 3 天运行一次
+    - cron: "0 0 */28 * *"  # 每 3 天运行一次
 
 env:
   REPO_URL: https://github.com/immortalwrt/immortalwrt
