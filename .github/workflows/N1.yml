@@ -43,7 +43,7 @@ jobs:
         run: |
           sudo -E apt-get update -y
           sudo -E apt-get full-upgrade -y
-          sudo -E apt-get install -y $(curl -fsSL https://raw.githubusercontent.com/nantayo/My-Pkg/master/2410)
+          sudo -E apt-get install -y $(curl -fsSL https://raw.githubusercontent.com/nantayo/My-Pkg/master/openwrt)
           sudo -E apt-get autoremove --purge
           sudo -E apt-get clean
           sudo timedatectl set-timezone "$TZ"
