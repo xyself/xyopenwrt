@@ -1,33 +1,31 @@
-name: N1  # 工作流名称
+name: N1
 
 on:
-  workflow_dispatch:  # 手动触发
-   inputs:
+  workflow_dispatch:
+    inputs:
       ssh:
         description: 'SSH connection to Actions'
         required: false
         default: 'false'
   schedule:
-    - cron: "0 0 */7 * *"  # 每 3 天运行一次
+    - cron: "0 0 */7 * *"  # 每 7 天运行一次
 
 env:
   REPO_URL: https://github.com/immortalwrt/immortalwrt
   REPO_BRANCH: openwrt-24.10
   CONFIG_FILE: N1/268.config
   DIY_SH: N1/diy.sh
-  TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
-  TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   FILES: N1/files
   TZ: Asia/Shanghai
-  
+
 jobs:
   build:
-    runs-on: ubuntu-24.04  # 运行环境
+    runs-on: ubuntu-24.04
 
     steps:
+
     - name: 检出代码
-      uses: actions/checkout@main
+      uses: actions/checkout@v4
 
     - name: 释放磁盘空间
       uses: jlumbroso/free-disk-space@main
@@ -51,9 +49,7 @@ jobs:
         sudo -E apt-get clean
         sudo timedatectl set-timezone "$TZ"
         sudo mkdir -p /workdir
-        sudo chown $USER:$GROUPS /workdir
-
-   
+        sudo chown $USER:$USER /workdir
 
     - name: 克隆源码
       working-directory: /workdir
@@ -78,14 +74,13 @@ jobs:
 
     - name: SSH 连接到 Actions
       uses: P3TERX/ssh2actions@main
-      if: (github.event.inputs.ssh == 'true') || contains(github.event.action, 'ssh')
+      if: ${{ github.event.inputs.ssh == 'true' }}
 
     - name: 下载依赖包
       working-directory: ./openwrt
       run: |
         make defconfig
         make download -j8
-        find dl -size -1024c -exec ls -l {} \;
         find dl -size -1024c -exec rm -f {} \;
 
     - name: 编译固件
@@ -93,11 +88,10 @@ jobs:
         chmod -R 755 openwrt
         cd openwrt
         echo -e "$(nproc) thread compile"
-        make -j$(nproc) || make -j1 || make -j1 V=s
-        echo "compile_status=success" >> $GITHUB_ENV
+        make -j$(nproc) || make -j1 V=s
 
     - name: 打包 ARM 版本 OpenWrt
-      if: ${{ env.compile_status }} == 'success' && !cancelled()
+      if: ${{ success() && !cancelled() }}
       uses: unifreq/openwrt_packit@master
       env:
         OPENWRT_ARMVIRT: openwrt/bin/targets/*/*/*.tar.gz
@@ -107,60 +101,57 @@ jobs:
         GZIP_IMGS: .xz
         SCRIPT_DIY_PATH: N1/mk_s905d_n1.sh
         WHOAMI: xyself
-        OPENWRT_VER: $(date +"%Y.%m.%d")
+        OPENWRT_VER: ${{ github.run_number }}
         SW_FLOWOFFLOAD: 0
         SFE_FLOW: 0
 
-
     - name: 生成发布标签
-      if: ${{ env.PACKAGED_STATUS == 'success' }} && !cancelled()
+      id: tag
+      if: ${{ success() && !cancelled() }}
       run: |
-        echo "release_tag=$(date +"%Y.%m.%d-%H.%M")" >> ${GITHUB_OUTPUT}
-        touch release.txt
-        echo "
-        🍁 注意事项：首次使用建议全新刷写
-          
-        💻 适用机型: 斐讯N1
+        TAG_NAME="OpenWrt_$(date +'%Y.%m.%d-%H.%M')"
+        echo "tag_name=$TAG_NAME" >> $GITHUB_OUTPUT
 
-        📂 源码: ${{ env.REPO_URL }}
-
-        🌳 分支: ${{ env.REPO_BRANCH }}
-
-        ⏱️ 编译时间: $(date +"%Y年%m月%d日%H时%M分")
-
-        🌐 管理地址: 192.168.3.2
-
-        👤 用户名: root
-
-        🔒 密码: password 
-        
-        " >> release.txt
-        echo "tag_status=success" >> $GITHUB_ENV
+        echo "🍁 首次使用建议全新刷写" > release.txt
+        echo "" >> release.txt
+        echo "💻 适用机型: 斐讯N1" >> release.txt
+        echo "📂 源码: $REPO_URL" >> release.txt
+        echo "🌳 分支: $REPO_BRANCH" >> release.txt
+        echo "⏱️ 编译时间: $(date +'%Y年%m月%d日 %H:%M')" >> release.txt
+        echo "🌐 管理地址: 192.168.3.2" >> release.txt
+        echo "👤 用户名: root" >> release.txt
+        echo "🔒 密码: password" >> release.txt
 
     - name: 发布固件到 Releases
+      if: ${{ success() && !cancelled() }}
       uses: softprops/action-gh-release@v2
-      if: ${{ env.tag_status == 'success' }} && !cancelled()
       with:
-        tag_name: OpenWrt_${{ env.PACKAGED_OUTPUTDATE }}
-        files: ${{ env.PACKAGED_OUTPUTPATH }}/*.img.xz
+        tag_name: ${{ steps.tag.outputs.tag_name }}
+        files: openwrt/bin/**/*.img.xz
         body_path: release.txt
-        token: ${{ env.GITHUB_TOKEN }}
-
-    - name: 发送 Telegram 通知
-      if: env.TELEGRAM_TOKEN != '' && github.event.action != 'notg'
-      continue-on-error: true 
-      run: |
-        if [ "${{ job.status }}" == "success" ]; then
-            message="🎉 OpenWrt ${{ env.VERSION }} ${{ matrix.target }} 编译成功 😋"
-        else
-            message="❌ OpenWrt ${{ env.VERSION }} ${{ matrix.target }} 编译失败，请检查日志！"
-        fi
-        curl -k --data chat_id="${{ env.TELEGRAM_CHAT_ID }}" --data "text=${message}" "https://api.telegram.org/bot${{ env.TELEGRAM_TOKEN }}/sendMessage"
-
-    - name: 删除旧的 Releases
-      uses: dev-drprasad/delete-older-releases@master
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: 发送 Telegram 通知
+      if: ${{ always() && secrets.TELEGRAM_TOKEN != '' }}
+      continue-on-error: true
+      run: |
+        if [ "${{ job.status }}" = "success" ]; then
+          message="🎉 OpenWrt 编译成功"
+        else
+          message="❌ OpenWrt 编译失败"
+        fi
+
+        curl -s -k \
+          --data chat_id="${{ secrets.TELEGRAM_CHAT_ID }}" \
+          --data "text=${message}" \
+          "https://api.telegram.org/bot${{ secrets.TELEGRAM_TOKEN }}/sendMessage"
+
+    - name: 删除旧的 Releases
+      if: ${{ success() && !cancelled() }}
+      uses: dev-drprasad/delete-older-releases@master
       with:
-        keep_latest: 8  # 保留最近 6 个发布
-        delete_tags: true  # 删除对应的 Tag
+        keep_latest: 8
+        delete_tags: true
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
