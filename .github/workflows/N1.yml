@@ -133,20 +133,24 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     - name: 发送 Telegram 通知
-      if: ${{ always() && secrets.TELEGRAM_TOKEN != '' }}
+      if: ${{ always() }}
       continue-on-error: true
+      env:
+        TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+        TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
       run: |
-        if [ "${{ job.status }}" = "success" ]; then
-          message="🎉 OpenWrt 编译成功"
-        else
-          message="❌ OpenWrt 编译失败"
+        if [ -n "$TELEGRAM_TOKEN" ]; then
+          if [ "${{ job.status }}" = "success" ]; then
+            message="🎉 OpenWrt 编译成功"
+          else
+            message="❌ OpenWrt 编译失败"
+          fi
+          
+          curl -s -k \
+            --data chat_id="$TELEGRAM_CHAT_ID" \
+            --data "text=$message" \
+          "https://api.telegram.org/bot$TELEGRAM_TOKEN/sendMessage"
         fi
-
-        curl -s -k \
-          --data chat_id="${{ secrets.TELEGRAM_CHAT_ID }}" \
-          --data "text=${message}" \
-          "https://api.telegram.org/bot${{ secrets.TELEGRAM_TOKEN }}/sendMessage"
-
     - name: 删除旧的 Releases
       if: ${{ success() && !cancelled() }}
       uses: dev-drprasad/delete-older-releases@master
