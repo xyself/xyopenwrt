@@ -1,4 +1,4 @@
-name: N1quan  # 工作流名称
+name: N1  # 工作流名称
 
 on:
   workflow_dispatch:  # 手动触发
@@ -8,11 +8,11 @@ on:
         required: false
         default: 'false'
   schedule:
-    - cron: "0 0 */28 * *"  # 每 3 天运行一次
+    - cron: "0 0 */7 * *"  # 每 7 天运行一次
 
 env:
   REPO_URL: https://github.com/immortalwrt/immortalwrt
-  REPO_BRANCH: openwrt-24.10
+  REPO_BRANCH: openwrt-25.12
   CONFIG_FILE: N1/268.config
   DIY_SH: N1/diy.sh
   TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
@@ -23,7 +23,7 @@ env:
   
 jobs:
   build:
-    runs-on: ubuntu-24.04  # 运行环境
+    runs-on: ubuntu-24.04
 
     steps:
     - name: 检出代码
@@ -46,19 +46,16 @@ jobs:
       run: |
         sudo -E apt-get update -y
         sudo -E apt-get full-upgrade -y
-        sudo -E apt-get install -y $(curl -fsSL https://raw.githubusercontent.com/nantayo/My-Pkg/master/2410)
+        sudo -E apt-get install -y $(curl -fsSL https://raw.githubusercontent.com/nantayo/My-Pkg/refs/heads/master/openwrt)
         sudo -E apt-get autoremove --purge
         sudo -E apt-get clean
         sudo timedatectl set-timezone "$TZ"
         sudo mkdir -p /workdir
         sudo chown $USER:$GROUPS /workdir
 
-   
-
     - name: 克隆源码
       working-directory: /workdir
       run: |
-        df -hT $PWD
         git clone $REPO_URL -b $REPO_BRANCH --single-branch --depth=1 openwrt
         ln -sf /workdir/openwrt $GITHUB_WORKSPACE/openwrt
 
@@ -92,12 +89,11 @@ jobs:
       run: |
         chmod -R 755 openwrt
         cd openwrt
-        echo -e "$(nproc) thread compile"
         make -j$(nproc) || make -j1 || make -j1 V=s
         echo "compile_status=success" >> $GITHUB_ENV
 
     - name: 打包 ARM 版本 OpenWrt
-      if: ${{ env.compile_status }} == 'success' && !cancelled()
+      if: env.compile_status == 'success' && !cancelled()
       uses: unifreq/openwrt_packit@master
       env:
         OPENWRT_ARMVIRT: openwrt/bin/targets/*/*/*.tar.gz
@@ -111,35 +107,19 @@ jobs:
         SW_FLOWOFFLOAD: 0
         SFE_FLOW: 0
 
-
     - name: 生成发布标签
-      if: ${{ env.PACKAGED_STATUS == 'success' }} && !cancelled()
+      id: tag
+      if: env.PACKAGED_STATUS == 'success' && !cancelled()
       run: |
-        echo "release_tag=$(date +"%Y.%m.%d-%H.%M")" >> ${GITHUB_OUTPUT}
+        echo "release_tag=$(date +"%Y.%m.%d-%H.%M")" >> $GITHUB_OUTPUT
         touch release.txt
-        echo "
-        🍁 注意事项：首次使用建议全新刷写
-          
-        💻 适用机型: 斐讯N1
-
-        📂 源码: ${{ env.REPO_URL }}
-
-        🌳 分支: ${{ env.REPO_BRANCH }}
-
-        ⏱️ 编译时间: $(date +"%Y年%m月%d日%H时%M分")
-
-        🌐 管理地址: 192.168.3.2
-
-        👤 用户名: root
-
-        🔒 密码: password 
-        
-        " >> release.txt
+        echo "💻 适用机型: 斐讯N1" >> release.txt
+        echo "🌐 管理地址: 192.168.3.2" >> release.txt
         echo "tag_status=success" >> $GITHUB_ENV
 
     - name: 发布固件到 Releases
       uses: softprops/action-gh-release@v2
-      if: ${{ env.tag_status == 'success' }} && !cancelled()
+      if: env.tag_status == 'success' && !cancelled()
       with:
         tag_name: OpenWrt_${{ env.PACKAGED_OUTPUTDATE }}
         files: ${{ env.PACKAGED_OUTPUTPATH }}/*.img.xz
@@ -147,20 +127,15 @@ jobs:
         token: ${{ env.GITHUB_TOKEN }}
 
     - name: 发送 Telegram 通知
-      if: env.TELEGRAM_TOKEN != '' && github.event.action != 'notg'
+      if: env.TELEGRAM_TOKEN != '' && !cancelled()
       continue-on-error: true 
       run: |
-        if [ "${{ job.status }}" == "success" ]; then
-            message="🎉 OpenWrt ${{ env.VERSION }} ${{ matrix.target }} 编译成功 😋"
-        else
-            message="❌ OpenWrt ${{ env.VERSION }} ${{ matrix.target }} 编译失败，请检查日志！"
-        fi
-        curl -k --data chat_id="${{ env.TELEGRAM_CHAT_ID }}" --data "text=${message}" "https://api.telegram.org/bot${{ env.TELEGRAM_TOKEN }}/sendMessage"
+        curl -k --data chat_id="${{ env.TELEGRAM_CHAT_ID }}" --data "text=OpenWrt 编译状态: ${{ job.status }}" "https://api.telegram.org/bot${{ env.TELEGRAM_TOKEN }}/sendMessage"
 
     - name: 删除旧的 Releases
       uses: dev-drprasad/delete-older-releases@master
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        keep_latest: 8  # 保留最近 6 个发布
-        delete_tags: true  # 删除对应的 Tag
+        keep_latest: 8
+        delete_tags: true
