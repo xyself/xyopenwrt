@@ -14,6 +14,10 @@ function git_sparse_clone() {
 }
 
 # rm -rf feeds/luci/applications/luci-app-passwall
+# 删除原有的 Go 源码
+rm -rf feeds/packages/lang/golang
+# 使用 sbwml 提供的 golang 1.24 仓库（适配性更好）
+git clone https://github.com/sbwml/packages_lang_golang -b 24.x feeds/packages/lang/golang
 rm -rf feeds/packages/net/v2ray-geodata
 sed -i '/\/etc\/init\.d\/tailscale/d;/\/etc\/config\/tailscale/d;' feeds/packages/net/tailscale/Makefile
 git clone https://github.com/sbwml/luci-app-mosdns -b v5 package/mosdns
