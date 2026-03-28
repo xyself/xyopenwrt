@@ -1,4 +1,3 @@
-
 #!/bin/bash
 
 function git_sparse_clone() {
@@ -16,12 +15,17 @@ function git_sparse_clone() {
 # rm -rf feeds/luci/applications/luci-app-passwall
 # 使用 sbwml 提供的 golang 1.24 仓库（适配性更好）
 rm -rf feeds/packages/net/v2ray-geodata
-sed -i '/\/etc\/init\.d\/tailscale/d;/\/etc\/config\/tailscale/d;' feeds/packages/net/tailscale/Makefile
+rm -rf feeds/packages/lang/golang
+git clone https://github.com/sbwml/packages_lang_golang -b 26.x feeds/packages/lang/golang
 git clone https://github.com/sbwml/luci-app-mosdns -b v5 package/mosdns
 git clone https://github.com/sbwml/v2ray-geodata package/v2ray-geodata
+
 git clone --depth=1 https://github.com/ophub/luci-app-amlogic package/amlogic
 git clone https://github.com/nikkinikki-org/OpenWrt-nikki package/luci-app-nikki
+
+sed -i '/\/etc\/init\.d\/tailscale/d;/\/etc\/config\/tailscale/d;' feeds/packages/net/tailscale/Makefile
 git clone https://github.com/asvow/luci-app-tailscale package/luci-app-tailscale
+
 git_sparse_clone master https://github.com/kenzok8/openwrt-packages luci-theme-alpha luci-app-fileassistant
 git clone https://github.com/sirpdboy/luci-app-lucky package/lucky
 
