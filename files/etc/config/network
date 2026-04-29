@@ -9,10 +9,16 @@ config interface 'docker'
 	option device 'docker0'
 	option proto 'none'
 	option auto '0'
-
+	
 config interface 'lan'
-	option proto 'dhcp'
+	option proto 'static'
+	option netmask '255.255.255.0'
 	option device 'eth0'
+	option ipaddr '192.168.3.2'
+	option gateway '192.168.3.1'
+	option delegate '0'
+	option broadcast '192.168.3.255'
+	list dns '192.168.3.1'
 
 config device
 	option type 'bridge'
