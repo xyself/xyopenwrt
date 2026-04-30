@@ -1,4 +1,4 @@
-name: N1
+name: N1-2512
 
 on:
   workflow_dispatch:
@@ -69,7 +69,7 @@ jobs:
         $GITHUB_WORKSPACE/diy-2.sh
         rm -rf ./files ./.config
         mv "$GITHUB_WORKSPACE/files" ./files
-        mv "$GITHUB_WORKSPACE/.config" ./.config 
+        mv "$GITHUB_WORKSPACE/2512.config" ./.config 
         
     - name: SSH连接到Actions
       uses: P3TERX/ssh2actions@main
