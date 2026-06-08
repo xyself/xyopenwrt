@@ -89,6 +89,11 @@ jobs:
         cd openwrt
         echo -e "可使用的核心数：$(nproc)"
         make -j$(nproc) || make -j$(($(nproc) / 2)) || make -j1 V=s
+
+    - name: Debug rootfs
+      run: |
+        ls -lah openwrt/bin/targets/armsr/armv8/
+        find openwrt/bin/targets/armsr/armv8 -name "*rootfs*"
         
     - name: 打包ARM内核
       uses: unifreq/openwrt_packit@master
