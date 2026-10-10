@@ -67,9 +67,8 @@ jobs:
       run: |
         chmod +x $GITHUB_WORKSPACE/diy-2.sh
         $GITHUB_WORKSPACE/diy-2.sh
-        rm -rf ./files ./.config
-        mv "$GITHUB_WORKSPACE/files" ./files
-        mv "$GITHUB_WORKSPACE/2512.config" ./.config 
+        rm -rf ./.config
+        mv "$GITHUB_WORKSPACE/2512.config" ./.config
         
     - name: SSH连接到Actions
       uses: P3TERX/ssh2actions@main
