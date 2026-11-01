@@ -74,11 +74,8 @@ uci set firewall.@rule[-1].target='DROP'
 # ================= 5. Docker 与 Tailscale 兼容 =================
 # 禁止 Docker 调用旧版 iptables，转由 fw4 原生接管
 uci set dockerd.globals.iptables='0' 2>/dev/null
-# 禁止 Tailscale 注入冲突的 mangle 规则，持久化凭据并禁用 MagicDNS 劫持
+# 禁止 Tailscale 注入冲突的 mangle 规则
 uci set tailscale.settings.fw_mode='off' 2>/dev/null
-mkdir -p /etc/tailscale
-uci set tailscale.settings.state_file='/etc/tailscale/tailscaled.state' 2>/dev/null
-uci set tailscale.settings.disable_magic_dns='1' 2>/dev/null
 
 # ================= 6. Nikki (Mihomo) 零冲突精准适配 =================
 # 默认保持关闭，避免首次启动无订阅导致核心无限报错死循环
