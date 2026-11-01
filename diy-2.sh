@@ -60,6 +60,7 @@ uci set firewall.@rule[-1].src='lan'
 uci set firewall.@rule[-1].family='ipv6'
 uci set firewall.@rule[-1].proto='tcp'
 uci add_list firewall.@rule[-1].dest_port='22'
+uci add_list firewall.@rule[-1].dest_port='51414'
 uci add_list firewall.@rule[-1].dest_port='80'
 uci add_list firewall.@rule[-1].dest_port='445'
 uci add_list firewall.@rule[-1].dest_port='139'
@@ -71,7 +72,10 @@ uci add_list firewall.@rule[-1].dest_port='8080'
 uci add_list firewall.@rule[-1].dest_port='9090'
 uci set firewall.@rule[-1].target='DROP'
 
-# ================= 5. Docker 与 Tailscale 兼容 =================
+# ================= 5. SSH 端口统一为 51414 =================
+uci set dropbear.@dropbear[0].Port='51414'
+
+# ================= 6. Docker 与 Tailscale 兼容 =================
 # 禁止 Docker 调用旧版 iptables，转由 fw4 原生接管
 uci set dockerd.globals.iptables='0' 2>/dev/null
 # 禁止 Tailscale 注入冲突的 mangle 规则
